@@ -55,8 +55,9 @@ var (
 )
 
 func main() {
-	if len(os.Args) < 3 {
+	if len(os.Args) < 4 {
 		fmt.Println("krypto num1 num2 ... numN target")
+		return
 	}
 	ints, err := parseInts(os.Args[1:])
 	if err != nil {
@@ -146,6 +147,7 @@ func perm(s []int, fn func([]int)) {
 		s[p], s[np] = s[np], s[p]
 		reverse(s[p+1:])
 	}
+	fn(s)
 }
 
 func pivot(s []int) int {
