@@ -14,6 +14,7 @@ const (
 	minus
 	times
 	divide
+	maxOp
 )
 
 var (
@@ -22,24 +23,29 @@ var (
 
 func krypto(s []int, target int, fn func([]int, []op)) {
 	rtarget := big.NewRat(int64(target), 1)
-	perm(s, func(a []int) {
-		count(len(s)-1, 4, func(op []op) {
-			v := r(a[0])
-			for i := 0; i < len(a)-1; i++ {
-				if op[i] == divide && a[i+1] == 0 {
-					return // skip
-				}
-				v = op[i].calc(v, r(a[i+1]))
-			}
-			if v.Cmp(rtarget) == 0 {
+	nums(s, func(a []int) {
+		ops(len(s)-1, maxOp, func(op []op) {
+			res := calc(a, op)
+			if res != nil && res.Cmp(rtarget) == 0 {
 				fn(a, op)
 			}
 		})
 	})
 }
 
-// perm iterates through all the permutations of the numbers
-func perm(s []int, fn func([]int)) {
+func calc(a []int, op []op) *big.Rat {
+	v := r(a[0])
+	for i := 0; i < len(a)-1; i++ {
+		if op[i] == divide && a[i+1] == 0 {
+			return nil // skip
+		}
+		v = op[i].calc(v, r(a[i+1]))
+	}
+	return &v
+}
+
+// nums iterates through all the permutations of the numbers
+func nums(s []int, fn func([]int)) {
 	sort.Ints(s)
 	for {
 		p := pivot(s)
@@ -76,8 +82,8 @@ func reverse(s []int) {
 	}
 }
 
-// count iterates through all possible operators
-func count(digits int, max op, fn func([]op)) {
+// ops iterates through all possible operators
+func ops(digits int, max op, fn func([]op)) {
 	s := make([]op, digits)
 	for s[len(s)-1] < max {
 		fn(s)
