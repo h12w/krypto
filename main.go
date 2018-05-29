@@ -13,13 +13,19 @@ func main() {
 		fmt.Println("krypto num1 num2 ... numN target")
 		return
 	}
-	ints, err := parseInts(os.Args[1:])
+	kryptoMain(os.Args[1:], func(answer string) {
+		fmt.Println(answer)
+	})
+}
+
+func kryptoMain(args []string, output func(string)) {
+	ints, err := parseInts(args)
 	if err != nil {
 		log.Fatal("wrong arguments", os.Args[1:])
 	}
 	s, target := ints[:len(ints)-1], ints[len(ints)-1]
 	krypto(s, target, func(a []int, op []op) {
-		fmt.Println(format(a, op))
+		output(format(a, op))
 	})
 }
 
